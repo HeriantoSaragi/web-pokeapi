@@ -1,0 +1,28 @@
+<h1 class="pokedex-header">Pokedex</h1>
+
+<div class="filter-container" style="display: flex; justify-content: flex-end; margin-bottom: 10px;">
+    <button class="filter-button" (click)="toggleFilterDropdown()">
+        <i class="fa fa-sliders" aria-hidden="true" style="margin-right: 5px;"></i>
+        Filter
+    </button>
+    <div *ngIf="showFilterDropdown" class="filter-dropdown">
+        <label *ngFor="let type of pokemonTypes">
+            <input type="checkbox" [value]="type" (change)="onTypeFilterChange($event)" />
+            {{ type | titlecase }}
+        </label>
+    </div>
+</div>
+
+<div class="pokemon-container">
+    <div *ngFor="let pokemon of filteredPokemons" class="pokemon-card {{ pokemon.types[0].type.name }}"
+        (click)="openPokemonDetail(pokemon.id)">
+        <img [src]="pokemon.sprites.front_default" alt="{{ pokemon.name }}" />
+        <p>{{ pokemon.name | titlecase }}</p>
+    </div>
+</div>
+
+<div class="pagination" style="display: flex; justify-content: center; align-items: center; gap: 10px; margin-top: 20px;">
+    <button (click)="previousPage()" [disabled]="offset === 0">Previous</button>
+    <span>{{ currentStart + 1 }} - {{ currentEnd }} of {{ totalPokemons }}</span>
+    <button (click)="nextPage()" [disabled]="currentEnd >= totalPokemons">Next</button>
+</div>

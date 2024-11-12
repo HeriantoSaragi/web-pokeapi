@@ -1,0 +1,215 @@
+$backgroundColor: #f0f0f0;
+
+// Warna berdasarkan tipe Pokémon
+$types: (
+    "fire": #F08030,
+    "water": #6890F0,
+    "grass": #78C850,
+    "electric": #F8D030,
+    "ice": #98D8D8,
+    "fighting": #C03028,
+    "poison": #A040A0,
+    "ground": #E0C068,
+    "flying": #A890F0,
+    "psychic": #F85888,
+    "bug": #A8B820,
+    "rock": #B8A038,
+    "ghost": #705898,
+    "dark": #705848,
+    "dragon": #7038F8,
+    "steel": #B8B8D0,
+    "fairy": #EE99AC,
+    "normal": #A8A878
+);
+
+.pokemon-detail-card {
+    position: relative;
+    max-width: 500px;
+    margin: 20px auto;
+    padding: 20px;
+    border-radius: 15px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    color: #fff;
+    overflow: hidden;
+    background: linear-gradient(to bottom, $backgroundColor 50%, #fff 50%);
+
+    // Dynamic background gradient for each Pokémon type
+    @each $type, $color in $types {
+        &.#{$type} {
+            background: linear-gradient(to bottom, #{$color} 50%, #fff 50%);
+        }
+    }
+
+    .back-button {
+        position: absolute;
+        top: 20px; // Adjust top value to space the button properly
+        left: 20px;
+        z-index: 10;
+    }
+
+    .back-button button {
+        padding: 10px 20px;
+        background-color: #007bff;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+
+    .back-button button:hover {
+        background-color: #0056b3;
+    }
+
+    .pokemon-header {
+        position: absolute;
+        top: 60px; // Adjust top margin to leave space for the Back button
+        left: 20px;
+        text-align: left;
+        z-index: 1;
+
+        h2 {
+            margin: 0;
+            font-size: 1.8rem;
+            color: inherit;
+        }
+
+        .type-container {
+            display: flex;
+            gap: 5px;
+
+            .type {
+                background-color: rgba(255, 255, 255, 0.2);
+                padding: 5px 10px;
+                border-radius: 10px;
+                font-size: 0.8rem;
+                text-transform: capitalize;
+                color: #fff;
+            }
+        }
+    }
+
+    // Adjusting the Pokemon image container to accommodate changes in header positioning
+    .pokemon-image-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        position: relative;
+        margin-top: 50px; // Space for the header
+
+        img {
+            width: 180px;
+            height: auto;
+            position: relative;
+            z-index: 2;
+            margin-bottom: -20px; // Positioning the feet inside the card
+        }
+    }
+
+
+    .tabs {
+        display: flex;
+        justify-content: space-around;
+        margin-top: 20px;
+
+        button {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            background: transparent;
+            color: #fff;
+            font-weight: bold;
+            cursor: pointer;
+
+            &.active {
+                border-bottom: 2px solid #fff;
+            }
+        }
+    }
+
+    // Ensure Evolution tab content stays in place with a fixed height
+    .tab-content {
+        background-color: #fff;
+        color: #333;
+        border-radius: 15px;
+        padding: 20px;
+        margin-top: 15px;
+        min-height: 300px;
+        /* Add a minimum height for consistency */
+    }
+
+    .evolution-section {
+        min-height: 200px;
+        /* Ensure the Evolution section has a minimum height */
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+    }
+
+    .evolution-card {
+        background-color: #f9f9f9;
+        padding: 15px;
+        margin: 10px 0;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .evolution-card h4 {
+        font-size: 1.2em;
+        margin-bottom: 10px;
+    }
+
+    .evolution-card p {
+        font-size: 1em;
+        margin: 5px 0;
+    }
+
+    .evolution-card p:last-child {
+        margin-bottom: 0;
+    }
+
+    // Styling for evolution tab content
+    .evolution-section p {
+        text-align: center;
+        margin-top: 20px;
+        color: #333;
+        font-size: 1.2rem;
+    }
+
+    .evolution-section .evolution-card {
+        margin-bottom: 20px;
+    }
+
+    //bar stat
+    .stat-container {
+        display: flex;
+        align-items: center;
+        margin-bottom: 10px;
+    }
+
+    .stat-label {
+        width: 120px;
+        /* Adjust width as needed */
+        font-weight: bold;
+    }
+
+    .progress-bar {
+        width: 100%;
+        height: 8px;
+        /* Thinner progress bar */
+        background-color: #e0e0e0;
+        border-radius: 4px;
+        overflow: hidden;
+    }
+
+    .progress-bar-fill {
+        height: 100%;
+        border-radius: 4px;
+    }
+
+    
+
+
+
+}

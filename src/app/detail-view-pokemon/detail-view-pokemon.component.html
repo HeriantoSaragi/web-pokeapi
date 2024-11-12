@@ -1,0 +1,71 @@
+<div *ngIf="pokemon && pokemon.types && pokemon.types.length > 0"
+    class="pokemon-detail-card {{ pokemon.types[0]?.type.name }}">
+
+    <!-- Tombol Back -->
+    <div class="back-button">
+        <i (click)="goBack()" class="fas fa-arrow-left"></i>
+    </div>
+
+    <!-- Kartu Detail Pokémon -->
+    <div class="pokemon-header">
+        <h2>{{ pokemon.name | titlecase }}</h2>
+        <div class="pokemon-id">#{{ pokemon.id | number: '3.0' }}</div> <!-- Format nomor Pokémon 3 digit -->
+        <div class="type-container">
+            <span *ngFor="let type of pokemon.types" class="type">{{ type.type.name | titlecase }}</span>
+        </div>
+    </div>
+
+    <!-- Gambar Pokémon -->
+    <div class="pokemon-image-container">
+        <img [src]="pokemon.sprites?.other['official-artwork'].front_default" alt="{{ pokemon.name }}">
+    </div>
+
+    <!-- Tabs -->
+    <div class="tabs">
+        <button (click)="selectTab('about')" [class.active]="selectedTab === 'about'">About</button>
+        <button (click)="selectTab('base-stats')" [class.active]="selectedTab === 'base-stats'">Base Stats</button>
+        <button (click)="selectTab('evolution')" [class.active]="selectedTab === 'evolution'">Evolution</button>
+    </div>
+
+    <!-- Tab Konten -->
+    <div class="tab-content">
+        <div *ngIf="selectedTab === 'about'">
+            <h3>About</h3>
+            <p>Species: {{ species?.genera[7]?.genus }}</p>
+            <p>Height: {{ pokemon.height / 10 }} m</p>
+            <p>Weight: {{ pokemon.weight / 10 }} kg</p>
+            <p>Abilities: {{ mappedAbilities | titlecase }}</p>
+
+            <h3>Breeding</h3>
+            <p>Gender Ratio: <span [innerHTML]="genderRatio"></span></p>
+            <p>Egg Groups: {{ eggGroups | titlecase}}</p>
+            <p>Hatch Steps: Approx. {{ hatchSteps }} steps</p>
+        </div>
+        <div *ngIf="selectedTab === 'base-stats'">
+            <h3>Base Stats</h3>
+            <div *ngFor="let stat of pokemon.stats" class="stat-container">
+              <p class="stat-label">{{ stat.stat.name | titlecase }}: {{ stat.base_stat }}</p>
+              <div class="progress-bar">
+                <div
+                  class="progress-bar-fill"
+                  [style.width.%]="stat.base_stat"
+                  [style.background-color]="getStatColor(stat.base_stat)">
+                </div>
+              </div>
+            </div>
+        </div>
+
+        <div *ngIf="selectedTab === 'evolution'">
+            <h3>Evolution</h3>
+            <div *ngIf="pokemonEvolution && pokemonEvolution.length > 0">
+                <div *ngFor="let evolution of pokemonEvolution">
+                    <div class="evolution-card">
+                        <h4>{{ evolution.species | titlecase }}</h4>
+                        <p *ngIf="evolution.evolves_to">Evolves into: {{ evolution.evolves_to | titlecase }}</p>
+                        <p>Evolution level: {{ evolution.evolution_level || 'N/A' }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
