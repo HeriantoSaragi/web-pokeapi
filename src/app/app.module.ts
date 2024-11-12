@@ -5,12 +5,13 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { CommonModule } from '@angular/common';
 import { HomePokemonComponent } from './home-pokemon/home-pokemon.component';
-
+import { DetailViewPokemonComponent } from './detail-view-pokemon/detail-view-pokemon.component';
 
 @NgModule({
   declarations: [
     AppComponent,
-    HomePokemonComponent
+    HomePokemonComponent,
+    DetailViewPokemonComponent
   ],
   imports: [
     BrowserModule,
