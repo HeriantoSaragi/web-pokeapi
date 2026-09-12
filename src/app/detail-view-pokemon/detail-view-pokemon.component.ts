@@ -1,13 +1,15 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { PokemonService } from '../services/pokemon.service';
 import { Location } from '@angular/common';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 
 @Component({
-  selector: 'app-detail-view-pokemon',
-  templateUrl: './detail-view-pokemon.component.html',
-  styleUrls: ['./detail-view-pokemon.component.scss']
+    selector: 'app-detail-view-pokemon',
+    templateUrl: './detail-view-pokemon.component.html',
+    styleUrls: ['./detail-view-pokemon.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
+    standalone: false
 })
 export class DetailViewPokemonComponent implements OnInit {
 
@@ -18,7 +20,18 @@ export class DetailViewPokemonComponent implements OnInit {
   genderRatio: SafeHtml = '';
   hatchSteps: number = 0;
   mappedAbilities: string = '';
-  pokemonEvolution: any[];
+  speciesGenus: string = '';
+  pokemonEvolution: any[] = [];
+  loadingEvolution = false;
+
+  readonly statLabels: Record<string, string> = {
+    hp: 'HP',
+    attack: 'Attack',
+    defense: 'Defense',
+    'special-attack': 'Sp. Atk',
+    'special-defense': 'Sp. Def',
+    speed: 'Speed'
+  };
 
   constructor(
     private route: ActivatedRoute,
@@ -30,21 +43,16 @@ export class DetailViewPokemonComponent implements OnInit {
 
   ngOnInit(): void {
     const name = this.route.snapshot.paramMap.get('name');
-    console.log(this.route.snapshot.paramMap);
 
     if (name) {
       this.getPokemonDetail(name);
       this.getPokemonSpecies(name);
-      this.getPokemonEvolution(name);
     }
   }
 
   getPokemonDetail(name: string) {
     this.pokemonService.getPokemonDetail(name).subscribe(response => {
       this.pokemon = response;
-      console.log(response);
-
-      // Populate abilities
       this.mappedAbilities = this.mapAbilities(this.pokemon.abilities);
     });
   }
@@ -52,34 +60,45 @@ export class DetailViewPokemonComponent implements OnInit {
   getPokemonSpecies(name: string) {
     this.pokemonService.getPokemonSpecies(name).subscribe(response => {
       this.species = response;
-      console.log('spe', this.species);
-
-      // Calculate breeding info
+      this.speciesGenus = this.species.genera?.find((g: any) => g.language.name === 'en')?.genus || '';
       this.calculateBreedingInfo();
+
+      const evolutionChainUrl: string | undefined = this.species?.evolution_chain?.url;
+      const chainId = evolutionChainUrl?.match(/\/evolution-chain\/(\d+)\//)?.[1];
+      if (chainId) {
+        this.getPokemonEvolution(chainId);
+      }
     });
   }
 
-  getPokemonEvolution(name: string): void {
-    this.pokemonService.getPokemonEvolution(name).subscribe(response => {
-      console.log('Raw Evolution Data:', response);
+  getPokemonEvolution(chainId: string): void {
+    this.loadingEvolution = true;
+    this.pokemonService.getPokemonEvolution(chainId).subscribe(response => {
+      const stages = this.processEvolutionChain(response.chain);
+      this.pokemonEvolution = stages;
+      this.loadingEvolution = false;
 
-      this.pokemonEvolution = this.processEvolutionChain(response.chain);
-      console.log('Processed Evolution Chain:', this.pokemonEvolution);
+      stages.forEach(stage => {
+        this.pokemonService.getPokemonDetail(stage.species).subscribe((data: any) => {
+          stage.sprite = data?.sprites?.front_default;
+        });
+      });
     });
   }
 
 
   processEvolutionChain(chain: any): any[] {
-    const evolutionList = [];
+    const evolutionList: any[] = [];
 
-    const traverseChain = (node, level = 1) => {
+    const traverseChain = (node: any) => {
       evolutionList.push({
         species: node.species.name,
         evolves_to: node.evolves_to.length ? node.evolves_to[0].species.name : null,
         evolution_level: node.evolution_details.length ? node.evolution_details[0].min_level : null,
+        sprite: null
       });
       if (node.evolves_to && node.evolves_to.length > 0) {
-        traverseChain(node.evolves_to[0], level + 1);
+        traverseChain(node.evolves_to[0]);
       }
     };
 
@@ -105,23 +124,22 @@ export class DetailViewPokemonComponent implements OnInit {
   }
 
   mapEggGroups(eggGroups: any[]): string {
-    console.log('telur', eggGroups);
     return eggGroups.map(group => group.name).join(', ');
   }
-  
+
   calculateGenderRatio(genderRate: number): SafeHtml {
     if (genderRate < 0) return this.sanitizer.bypassSecurityTrustHtml('Genderless');
-    
+
     const femaleRatio = (genderRate / 8) * 100;
     const maleRatio = 100 - femaleRatio;
-  
+
     const femaleIcon = `<i class="fa fa-venus" style="color: #e91e63;"></i>`;  // Pink female icon
     const maleIcon = `<i class="fa fa-mars" style="color: #2196f3;"></i>`;    // Blue male icon
-  
+
     const genderRatioHtml = `${femaleRatio}% ${femaleIcon}, ${maleRatio}% ${maleIcon}`;
     return this.sanitizer.bypassSecurityTrustHtml(genderRatioHtml);
   }
-  
+
 
   calculateHatchSteps(hatchCounter: number): number {
     const stepsPerCycle = 257;
@@ -132,9 +150,14 @@ export class DetailViewPokemonComponent implements OnInit {
     this.location.back();
   }
 
-  getStatColor(statValue: number): string {
-    return statValue >= 50 ? '#4caf50' : '#f44336';  // Green for >= 50, Red for < 50
+  getStatLabel(statName: string): string {
+    return this.statLabels[statName] || statName;
   }
 
+  getStatColor(statValue: number): string {
+    if (statValue >= 100) return '#2ecc71';
+    if (statValue >= 60) return '#f1c40f';
+    return '#e74c3c';
+  }
 
 }

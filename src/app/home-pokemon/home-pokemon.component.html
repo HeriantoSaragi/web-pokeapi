@@ -1,28 +1,117 @@
-<h1 class="pokedex-header">Pokedex</h1>
-
-<div class="filter-container" style="display: flex; justify-content: flex-end; margin-bottom: 10px;">
-    <button class="filter-button" (click)="toggleFilterDropdown()">
-        <i class="fa fa-sliders" aria-hidden="true" style="margin-right: 5px;"></i>
-        Filter
-    </button>
-    <div *ngIf="showFilterDropdown" class="filter-dropdown">
-        <label *ngFor="let type of pokemonTypes">
-            <input type="checkbox" [value]="type" (change)="onTypeFilterChange($event)" />
-            {{ type | titlecase }}
-        </label>
-    </div>
+<div class="pokedex-hero">
+  <h1 class="pokedex-header">Pokédex</h1>
+  <p class="pokedex-subtitle">Explore, search, and discover every Pokémon</p>
 </div>
+
+<div class="toolbar">
+  <div class="search-box">
+    <i class="fa fa-search" aria-hidden="true"></i>
+    <input
+      type="text"
+      placeholder="Search Pokémon by name..."
+      [value]="searchTerm"
+      (input)="onSearchChange($event)" />
+    @if (searchTerm) {
+      <button class="clear-search" type="button" (click)="clearSearch()" aria-label="Clear search">&times;</button>
+    }
+  </div>
+
+  <div class="filter-container">
+    <button class="filter-button" (click)="toggleFilterDropdown()">
+      <i class="fa fa-sliders" aria-hidden="true"></i>
+      Filter
+      @if (selectedTypes.size > 0) {
+        <span class="filter-count">{{ selectedTypes.size }}</span>
+      }
+    </button>
+    @if (showFilterDropdown) {
+      <div class="filter-dropdown">
+        <div class="filter-dropdown-header">
+          <span>Filter by type</span>
+          @if (selectedTypes.size > 0) {
+            <button type="button" class="clear-filters" (click)="clearTypeFilters()">Clear all</button>
+          }
+        </div>
+        @for (type of pokemonTypes; track type) {
+          <label>
+            <input type="checkbox" [value]="type" [checked]="isTypeSelected(type)" (change)="onTypeFilterChange($event)" />
+            {{ type | titlecase }}
+          </label>
+        }
+      </div>
+    }
+  </div>
+</div>
+
+@if (selectedTypes.size > 0) {
+  <div class="active-filters">
+    @for (type of selectedTypes; track type) {
+      <span class="filter-chip">
+        {{ type | titlecase }}
+        <button type="button" (click)="removeTypeFilter(type)" aria-label="Remove filter">&times;</button>
+      </span>
+    }
+  </div>
+}
 
 <div class="pokemon-container">
-    <div *ngFor="let pokemon of filteredPokemons" class="pokemon-card {{ pokemon.types[0].type.name }}"
-        (click)="openPokemonDetail(pokemon.id)">
-        <img [src]="pokemon.sprites.front_default" alt="{{ pokemon.name }}" />
-        <p>{{ pokemon.name | titlecase }}</p>
+  @for (pokemon of filteredPokemons; track pokemon) {
+    <div class="pokemon-card {{ pokemon.types[0].type.name }}"
+      (click)="openPokemonDetail(pokemon.id)">
+      <span class="pokemon-card-id">#{{ pokemon.id | number: '3.0' }}</span>
+      <div class="pokemon-card-image">
+        <img [src]="pokemon.sprites.front_default" alt="{{ pokemon.name }}" loading="lazy" />
+      </div>
+      <p class="pokemon-card-name">{{ pokemon.name | titlecase }}</p>
+      <div class="pokemon-card-types">
+        @for (t of pokemon.types; track t) {
+          <span class="type-badge">{{ t.type.name | titlecase }}</span>
+        }
+      </div>
     </div>
+  }
+  @if (!loading && totalPokemons === 0) {
+    <p class="no-results">No Pokémon found. Try a different search or filter.</p>
+  }
 </div>
 
-<div class="pagination" style="display: flex; justify-content: center; align-items: center; gap: 10px; margin-top: 20px;">
-    <button (click)="previousPage()" [disabled]="offset === 0">Previous</button>
-    <span>{{ currentStart + 1 }} - {{ currentEnd }} of {{ totalPokemons }}</span>
-    <button (click)="nextPage()" [disabled]="currentEnd >= totalPokemons">Next</button>
+<div class="pagination" [class.hidden]="totalPages <= 1">
+  <div class="pagination-controls">
+    <button class="page-nav" (click)="goToPage(1)" [disabled]="currentPage === 1" aria-label="First page">&laquo;</button>
+    <button class="page-nav" (click)="previousPage()" [disabled]="currentPage === 1" aria-label="Previous page">&lsaquo;</button>
+
+    @if (pageNumbers[0] > 1) {
+      <button class="page-number" (click)="goToPage(1)">1</button>
+      @if (pageNumbers[0] > 2) {
+        <span class="ellipsis">&hellip;</span>
+      }
+    }
+
+    @for (page of pageNumbers; track page) {
+      <button class="page-number" [class.active]="page === currentPage" (click)="goToPage(page)">{{ page }}</button>
+    }
+
+    @if (pageNumbers[pageNumbers.length - 1] < totalPages) {
+      @if (pageNumbers[pageNumbers.length - 1] < totalPages - 1) {
+        <span class="ellipsis">&hellip;</span>
+      }
+      <button class="page-number" (click)="goToPage(totalPages)">{{ totalPages }}</button>
+    }
+
+    <button class="page-nav" (click)="nextPage()" [disabled]="currentPage === totalPages" aria-label="Next page">&rsaquo;</button>
+    <button class="page-nav" (click)="goToPage(totalPages)" [disabled]="currentPage === totalPages" aria-label="Last page">&raquo;</button>
+  </div>
+
+  <div class="pagination-meta">
+    <span class="page-info">{{ currentStart + 1 }} - {{ currentEnd }} of {{ totalPokemons }}</span>
+    <label class="page-size">
+      Show
+      <select (change)="onPageSizeChange($event)">
+        @for (size of pageSizeOptions; track size) {
+          <option [value]="size" [selected]="size === limit">{{ size }}</option>
+        }
+      </select>
+      per page
+    </label>
+  </div>
 </div>

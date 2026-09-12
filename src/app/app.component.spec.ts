@@ -26,10 +26,10 @@ describe('AppComponent', () => {
     expect(app.title).toEqual('pokemon-app');
   });
 
-  it('should render title', () => {
+  it('should render the router outlet', () => {
     const fixture = TestBed.createComponent(AppComponent);
     fixture.detectChanges();
     const compiled = fixture.nativeElement;
-    expect(compiled.querySelector('.content span').textContent).toContain('pokemon-app app is running!');
+    expect(compiled.querySelector('router-outlet')).toBeTruthy();
   });
 });

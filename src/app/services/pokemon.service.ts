@@ -14,6 +14,14 @@ export class PokemonService {
     return this.http.get(`${this.apiUrl}/pokemon?limit=${limit}&offset=${offset}`);
   }
 
+  getAllPokemonNames(): Observable<any> {
+    return this.http.get(`${this.apiUrl}/pokemon?limit=100000&offset=0`);
+  }
+
+  getPokemonsByType(type: string): Observable<any> {
+    return this.http.get(`${this.apiUrl}/type/${type}`);
+  }
+
   getPokemonDetail(name: string): Observable<any> {
     return this.http.get(`${this.apiUrl}/pokemon/${name}`);
   }

@@ -1,47 +1,108 @@
- 
-  .pokedex-header {
+  @use "sass:color";
+
+  :host {
+    display: block;
+    min-height: 100vh;
+    background: #f4f5f7;
+    padding-bottom: 30px;
+  }
+
+  .pokedex-hero {
     text-align: center;
-    font-size: 2em;
-    margin-bottom: 20px;
-}
-  
+    padding: 40px 20px 28px;
+    background: linear-gradient(135deg, #ff5e62 0%, #ff9966 100%);
+    color: #fff;
+    border-radius: 0 0 30px 30px;
+    margin-bottom: 24px;
+    box-shadow: 0 6px 20px rgba(255, 94, 98, 0.25);
+  }
+
+  .pokedex-header {
+    font-size: 2.4em;
+    font-weight: 700;
+    margin: 0;
+    letter-spacing: 1px;
+  }
+
+  .pokedex-subtitle {
+    margin: 6px 0 0;
+    font-size: 0.95em;
+    opacity: 0.9;
+  }
+
   .pokemon-container {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
     gap: 20px;
-    padding: 20px;
+    padding: 0 20px 20px;
     justify-items: center;
-  
+
     .pokemon-card {
-      width: 150px;
-      height: 200px;
-      border-radius: 10px;
+      position: relative;
+      width: 100%;
+      max-width: 160px;
+      border-radius: 16px;
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: center;
-      padding: 10px;
+      padding: 14px 10px 12px;
       color: #fff;
-      font-weight: bold;
       text-align: center;
-      transition: transform 0.3s ease;
-  
+      cursor: pointer;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+
       &:hover {
-        transform: scale(1.05);
+        transform: translateY(-4px);
+        box-shadow: 0 10px 18px rgba(0, 0, 0, 0.2);
       }
-  
-      img {
+
+      .pokemon-card-id {
+        align-self: flex-end;
+        font-size: 0.7rem;
+        font-weight: bold;
+        opacity: 0.8;
+      }
+
+      .pokemon-card-image {
         width: 100px;
         height: 100px;
-        margin-bottom: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(255, 255, 255, 0.18);
+        border-radius: 50%;
+        margin: 4px 0 10px;
       }
-  
-      p {
-        margin: 0;
+
+      img {
+        width: 76px;
+        height: 76px;
+        object-fit: contain;
+      }
+
+      .pokemon-card-name {
+        margin: 0 0 8px;
+        font-weight: bold;
+      }
+
+      .pokemon-card-types {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 4px;
+      }
+
+      .type-badge {
+        background: rgba(255, 255, 255, 0.28);
+        padding: 2px 9px;
+        border-radius: 10px;
+        font-size: 0.65rem;
+        font-weight: 600;
       }
     }
   }
-  
+
   // Warna latar belakang untuk setiap tipe Pokémon
   $types: (
     "fire": #F08030,
@@ -63,47 +124,189 @@
     "fairy": #EE99AC,
     "normal": #A8A878
   );
-  
+
   // Menggunakan loop untuk menghasilkan gaya berdasarkan tipe
   @each $type, $color in $types {
     .pokemon-card.#{$type} {
-      background-color: $color;
+      background: linear-gradient(160deg, $color 0%, color.adjust($color, $lightness: -12%) 100%);
     }
   }
   
   // Gaya pagination
   .pagination {
     display: flex;
+    flex-wrap: wrap;
     justify-content: center;
     align-items: center;
-    gap: 10px;
+    gap: 16px;
     margin-top: 20px;
-  
+    padding: 0 10px;
+
+    &.hidden {
+      display: none;
+    }
+
+    .pagination-controls {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .pagination-meta {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      align-items: center;
+      gap: 12px;
+    }
+
     button {
-      padding: 8px 16px;
       border: none;
       border-radius: 5px;
-      font-size: 16px;
       cursor: pointer;
-      transition: background-color 0.3s ease;
+      transition: background-color 0.2s ease, color 0.2s ease;
       color: #fff;
-  
+
       &:disabled {
         cursor: not-allowed;
         opacity: 0.5;
       }
-  
+
       &:not(:disabled):hover {
         background-color: #333;
       }
     }
-  
-    span {
+
+    .page-nav {
+      padding: 8px 14px;
       font-size: 16px;
+      background-color: #555;
+    }
+
+    .page-number {
+      min-width: 36px;
+      height: 36px;
+      padding: 0 8px;
+      font-size: 15px;
+      background-color: #e9e9e9;
+      color: #333;
+
+      &:not(:disabled):hover {
+        background-color: #555;
+        color: #fff;
+      }
+
+      &.active {
+        background-color: #007bff;
+        color: #fff;
+        font-weight: bold;
+      }
+    }
+
+    .ellipsis {
+      padding: 0 4px;
+      color: #888;
+    }
+
+    .page-info {
+      font-size: 15px;
       font-weight: bold;
+      white-space: nowrap;
+    }
+
+    .page-size {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 14px;
+      white-space: nowrap;
+
+      select {
+        padding: 4px 8px;
+        border-radius: 4px;
+        border: 1px solid #ccc;
+        font-size: 14px;
+      }
+    }
+  }
+
+  @media (max-width: 480px) {
+    .pagination {
+      .page-nav {
+        padding: 6px 10px;
+        font-size: 14px;
+      }
+
+      .page-number {
+        min-width: 30px;
+        height: 30px;
+        font-size: 13px;
+      }
     }
   }
   
+  .toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    padding: 0 20px;
+    margin-bottom: 10px;
+  }
+
+  .search-box {
+    position: relative;
+    flex: 1 1 260px;
+    max-width: 400px;
+    display: flex;
+    align-items: center;
+
+    .fa-search {
+      position: absolute;
+      left: 12px;
+      color: #999;
+      pointer-events: none;
+    }
+
+    input {
+      width: 100%;
+      padding: 9px 32px 9px 34px;
+      border: 1px solid #ccc;
+      border-radius: 20px;
+      font-size: 14px;
+      outline: none;
+      transition: border-color 0.2s ease;
+
+      &:focus {
+        border-color: #007bff;
+      }
+    }
+
+    .clear-search {
+      position: absolute;
+      right: 8px;
+      border: none;
+      background: transparent;
+      font-size: 18px;
+      line-height: 1;
+      color: #999;
+      cursor: pointer;
+      padding: 4px;
+
+      &:hover {
+        color: #333;
+      }
+    }
+  }
+
+  .filter-container {
+    position: relative;
+    flex: 0 0 auto;
+  }
+
   .filter-button {
     padding: 8px 12px;
     background-color: #007bff;
@@ -113,30 +316,115 @@
     cursor: pointer;
     display: flex;
     align-items: center;
+    gap: 6px;
     font-size: 16px;
+    white-space: nowrap;
   }
-  
+
   .filter-button:hover {
     background-color: #0056b3;
   }
-  
+
+  .filter-count {
+    background-color: #fff;
+    color: #007bff;
+    border-radius: 50%;
+    min-width: 18px;
+    height: 18px;
+    font-size: 12px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    padding: 0 4px;
+  }
+
   .filter-dropdown {
     position: absolute;
+    right: 0;
+    top: calc(100% + 6px);
     background-color: white;
     border: 1px solid #ddd;
     padding: 10px;
     border-radius: 5px;
-    max-width: 200px;
+    max-width: 220px;
+    max-height: 320px;
+    overflow-y: auto;
     z-index: 100;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   }
-  
+
+  .filter-dropdown-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-weight: bold;
+    margin-bottom: 8px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid #eee;
+
+    .clear-filters {
+      border: none;
+      background: none;
+      color: #007bff;
+      font-size: 12px;
+      font-weight: normal;
+      cursor: pointer;
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+  }
+
   .filter-dropdown label {
     display: flex;
     align-items: center;
     margin-bottom: 5px;
   }
-  
+
   .filter-dropdown input {
     margin-right: 5px;
   }
-  
+
+  .active-filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 0 20px;
+    margin-bottom: 15px;
+  }
+
+  .filter-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background-color: #e9f3ff;
+    color: #007bff;
+    border-radius: 16px;
+    padding: 4px 6px 4px 12px;
+    font-size: 13px;
+    font-weight: bold;
+
+    button {
+      border: none;
+      background: transparent;
+      color: inherit;
+      font-size: 16px;
+      line-height: 1;
+      cursor: pointer;
+      padding: 2px 6px;
+
+      &:hover {
+        color: #333;
+      }
+    }
+  }
+
+  .no-results {
+    grid-column: 1 / -1;
+    text-align: center;
+    color: #888;
+    font-size: 16px;
+    padding: 40px 0;
+  }
